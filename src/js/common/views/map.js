@@ -11,19 +11,21 @@ define([
       zoom: 4
     },
 
-    tileLayers: {
-      mapnikBW: {
-        url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
-        name: 'Mapnik B&W'
-      },
-      mqTile: {
+    tileLayers: [
+      {
+        id: 'mqTile',
         url: 'http://mtile0{s}.mqcdn.com/tiles/1.0.0/vy/sat/{z}/{x}/{y}.png',
         options: {
           subdomains: '1234'
         },
         name: 'Satellite'
-      }
-    },
+      },
+      {
+        id: 'mapnikBW',
+        url: 'http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png',
+        name: 'Mapnik B&W'
+      },
+    ],
 
     _baseLayers: null,
 
@@ -53,15 +55,15 @@ define([
     },
 
     initBaseLayers: function() {
-      _.each(this.tileLayers, function(layer, layerKey) {
+      _.each(this.tileLayers, function(layer) {
         var layerOptions = layer.options || {};
-        this._baseLayers[layerKey] = L.tileLayer(layer.url, layerOptions);
+        this._baseLayers[layer.id] = L.tileLayer(layer.url, layerOptions);
       }, this);
     },
 
     addTileLayers: function() {
-      _.each(this._baseLayers, function(layer) {
-        layer.addTo(this._map);
+      _.each(this.tileLayers, function(layer) {
+        this._baseLayers[layer.id].addTo(this._map);
       }, this);
     },
 
@@ -69,9 +71,9 @@ define([
      * Add a widget to toggle between layers on the map.
      */
     addLayersToControl: function() {
-      _.each(this._baseLayers, function(layer, layerKey) {
-        var layerName = this.tileLayers[layerKey].name;
-        this._layersControl.addBaseLayer(layer, layerName);
+      _.each(this.tileLayers, function(layer) {
+        var baseLayer = this._baseLayers[layer.id];
+        this._layersControl.addBaseLayer(baseLayer, layer.name);
       }, this);
     },
 
