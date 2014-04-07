@@ -1,2 +1,2 @@
-backbone-d3-viz
-===============
+backbone-d3
+===========
